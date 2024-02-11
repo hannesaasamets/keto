@@ -30,11 +30,17 @@ const foodIngredients = computed(() =>
 <template>
   <AnIngredient v-for="(food, index) in foodIngredients">
     <template #icon>
-      <DocumentationIcon v-if="index % 5 === 0" />
-      <ToolingIcon v-if="index % 5 === 1" />
-      <EcosystemIcon v-if="index % 5 === 2" />
-      <CommunityIcon v-if="index % 5 === 3" />
-      <SupportIcon v-if="index % 5 === 4" />
+      <component
+        :is="food.fdcId ? 'a' : 'span'"
+        :href="`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${food.fdcId}/nutrients`"
+        style="padding: 0.4rem 1rem"
+      >
+        <DocumentationIcon v-if="index % 5 === 0" />
+        <ToolingIcon v-if="index % 5 === 1" />
+        <EcosystemIcon v-if="index % 5 === 2" />
+        <CommunityIcon v-if="index % 5 === 3" />
+        <SupportIcon v-if="index % 5 === 4" />
+      </component>
     </template>
     <template #heading>
       {{ food.name }}

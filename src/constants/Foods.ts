@@ -53,7 +53,7 @@ const Foods = ([{
     carbs: .0297,
     fats: .0014,
     proteins: .009,
-    fdcIc: 169248,
+    fdcId: 169248,
 }, {
     name: 'Baby Spinach',
     unit: 'grams',
@@ -63,7 +63,7 @@ const Foods = ([{
     carbs: .0241,
     fats: .0062,
     proteins: .0285,
-    fdcIc: 1999632,
+    fdcId: 1999632,
 }, {
     name: 'Flax Oil',
     unit: 'grams',
