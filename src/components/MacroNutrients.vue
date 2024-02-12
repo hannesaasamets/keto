@@ -17,26 +17,32 @@ const foodIngredients = computed(() =>
         food.name === ingredient.name),
     })));
 
-const macroNutrients = computed(() => ({
-  carbs: foodIngredients.value.reduce((acc, ingredient) =>
-    acc + ingredient.quantity * ingredient.unitGrams * ingredient.carbs, 0),
-  proteins: foodIngredients.value.reduce((acc, ingredient) =>
-    acc + ingredient.quantity * ingredient.unitGrams * ingredient.proteins, 0),
-  fats: foodIngredients.value.reduce((acc, ingredient) =>
-    acc + ingredient.quantity * ingredient.unitGrams * ingredient.fats, 0),
-}));
+type MacroNutrientName = 'carbs' | 'proteins' | 'fats';
+const macroNutrientNames = ['carbs', 'proteins', 'fats'] as readonly MacroNutrientName[];
+
+const macroNutrientsWeights = computed(() => macroNutrientNames.map(macroNutrientName => [
+  macroNutrientName,
+  foodIngredients.value.reduce((acc, ingredient) =>
+    acc + ingredient.quantity * ingredient.unitGrams * ingredient[macroNutrientName], 0),
+] as [
+  MacroNutrientName,
+  weight: number,
+]));
 
 const totalWeight = computed(() =>
-  Object.values(macroNutrients.value).reduce((acc, weight) =>
+  macroNutrientsWeights.value.reduce((acc, [, weight]) =>
     acc + weight, 0));
 
-const macroNutrientsPercentages = computed(() => Object
-  .entries(macroNutrients.value)
-  .map(([name, weight]) => [
-    name,
-    weight / totalWeight.value || 0,
-    weight,
-  ] as [string, number, number]));
+const macroNutrientsWeightsPercentages = computed(() =>
+  macroNutrientsWeights.value.map(([macroNutrientName, weight]) => [
+    macroNutrientName,
+    Math.round(weight),
+    Math.round(weight / totalWeight.value * 100 || 0),
+  ] as [
+    MacroNutrientName,
+    weight: number,
+    percentage: number,
+  ]));
 
 const totalEnergy = computed(() => Math.round(
   foodIngredients.value.reduce((acc, ingredient) =>
@@ -47,17 +53,17 @@ const totalEnergy = computed(() => Math.round(
 <template>
   <div class="greetings">
     <h1>{{ totalEnergy }} kcal</h1>
-    <h3 v-for="[name, percentage, weight] in macroNutrientsPercentages">
+    <h3 v-for="[name, weight, percentage] in macroNutrientsWeightsPercentages">
       <p>
         <span>
           <span style="color: #10b981; margin-right: .5rem">
-            {{ Math.round(percentage * 100) }}<span style="font-size: .9rem; margin-left: .1rem">%</span>
+            {{ percentage }}<span style="font-size: .9rem; margin-left: .1rem">%</span>
           </span>
-          {{ Math.round(weight) }}<span style="margin-left: .2rem">g</span>
+          {{ weight }}<span style="margin-left: .2rem">g</span>
         </span>
         <span style="text-transform: capitalize; margin-left: .9rem">{{ name }}</span>
       </p>
-      <Slider :model-value="percentage * 100" style="min-width: 16rem" />
+      <Slider :model-value="percentage" style="min-width: 16rem" />
     </h3>
   </div>
 </template>
